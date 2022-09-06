@@ -1,0 +1,8 @@
+name: Sit
+version: '${project.version}'
+main: com.purpurmc.sit.Sit
+api-version: 1.19
+prefix: Sit
+authors: [ UsainSrht ]
+description: Simple stair sitting plugin.
+website: purpurmc.com
