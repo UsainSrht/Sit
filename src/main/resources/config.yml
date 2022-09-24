@@ -1,0 +1,42 @@
+event:
+  onsit:
+    #https://purpurmc.org/javadoc/org/bukkit/event/EventPriority.html
+    priority: HIGH
+  onstandup:
+    priority: NORMAL
+
+sitables:
+  stairs:
+    entity:
+      type: PIG
+      saddle: true
+    offsets:
+      x: 0.5
+      y: 0.4
+      z: 0.5
+    #BLOCKDATA, BLOCKS
+    check: BLOCKDATA
+    list:
+      - org.bukkit.block.data.type.Stairs
+  slabs:
+    entity:
+      type: PIG
+      saddle: true
+    offsets:
+      x: 0.5
+      y: 0.4
+      z: 0.5
+    check: BLOCKDATA
+    list:
+      - org.bukkit.block.data.type.Slab
+  fun:
+    entity:
+      type: ARMOR_STAND
+      saddle: false
+    offsets:
+      x: 0.5
+      y: 0.9
+      z: 0.5
+    check: BLOCKS
+    list:
+      - END_ROD
