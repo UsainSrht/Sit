@@ -117,6 +117,9 @@ public class Events implements Listener {
                     break;
             }
         }
+        else {
+            loc.setYaw(p.getLocation().getYaw());
+        }
 
         if (bd instanceof Stairs) {
             Stairs.Shape shape = ((Stairs) bd).getShape();

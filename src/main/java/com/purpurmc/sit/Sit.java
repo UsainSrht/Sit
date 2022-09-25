@@ -2,6 +2,8 @@ package com.purpurmc.sit;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.ArrayList;
+
 public final class Sit extends JavaPlugin {
 
     public static Sit instance;
@@ -11,7 +13,10 @@ public final class Sit extends JavaPlugin {
         instance = this;
         getServer().getPluginManager().registerEvents(new Events(), this);
         saveDefaultConfig();
-        SitCommand.registerCommand();
+        CommandHandler.register(new SitCommand("sit",
+                "command to reload plugin's config",
+                "/sit reload",
+                new ArrayList<>()));
     }
 
     @Override

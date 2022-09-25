@@ -1,32 +1,26 @@
 package com.purpurmc.sit;
 
-import com.mojang.brigadier.CommandDispatcher;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
 
-import static com.mojang.brigadier.builder.LiteralArgumentBuilder.literal;
-import static com.mojang.brigadier.builder.RequiredArgumentBuilder.argument;
+import java.util.List;
 
-public class SitCommand {
+public class SitCommand extends Command {
 
-    public static void registerCommand() {
-        Sit.getInstance().getLogger().info("register method called");
-        CommandDispatcher<Object> dispatcher = new CommandDispatcher<>();
-
-        dispatcher.register(
-                literal("sit")
-                        .then(
-                                argument("reload", StringArgument.string())
-                                        .executes(c -> {
-                                            ((CommandSender)c.getSource()).sendMessage(Component.text("reloaded"));
-                                            return 1;
-                                        })
-                        )
-                        .executes(c -> {
-                            ((CommandSender)c.getSource()).sendMessage(Component.text("called without arguments"));
-                            return 1;
-                        })
-        );
-        Sit.getInstance().getLogger().info("register method finished");
+    protected SitCommand(@NotNull String name, @NotNull String description, @NotNull String usageMessage, @NotNull List<String> aliases) {
+        super(name, description, usageMessage, aliases);
     }
+
+    @Override
+    public boolean execute(CommandSender sender, String command, String[] args) {
+        if (args[0].equalsIgnoreCase("reload")) {
+            Sit.getInstance().reloadConfig();
+            sender.sendMessage(Component.text("config reloaded succesfully", NamedTextColor.GREEN));
+        }
+        return false;
+    }
+
 }
