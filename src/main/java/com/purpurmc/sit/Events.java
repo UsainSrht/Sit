@@ -1,6 +1,5 @@
 package com.purpurmc.sit;
 
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -29,12 +28,7 @@ import java.util.Set;
 
 public class Events implements Listener {
 
-    public Sit instance = Sit.getInstance();
-    public FileConfiguration config = instance.getConfig();
-
-    //public final EventPriority priority = EventPriority.valueOf(instance.getConfig().getString("events.onsit.priority"));
-
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onSit(PlayerInteractEvent e) {
         if (!e.getHand().equals(EquipmentSlot.HAND)) return;
 
@@ -44,8 +38,16 @@ public class Events implements Listener {
         BlockData bd = b.getBlockData();
         String offsetmode = "";
 
+        Sit instance = Sit.getInstance();
+        FileConfiguration config = instance.getConfig();
+
+        Player p = e.getPlayer();
+
         Set<String> nodes = config.getConfigurationSection("sitables").getKeys(false);
         for (String node : nodes) {
+
+            if (!p.hasPermission("sit." + node)) break;
+
             String mode = config.getString("sitables." + node + ".check");
             switch (mode) {
                 case "BLOCKDATA":
@@ -84,8 +86,6 @@ public class Events implements Listener {
             if (!((Slab) bd).getType().equals(Slab.Type.BOTTOM)) return;
         }
 
-        Player p = e.getPlayer();
-
         if (p.isSneaking()) return;
 
         if (!p.getInventory().getItemInMainHand().getType().equals(Material.AIR)) return;
@@ -101,7 +101,7 @@ public class Events implements Listener {
         double adderz = config.getDouble("sitables." + offsetmode + ".offsets.z");
 
         loc.setX(loc.getX() + adderx);
-        loc.setY(loc.getY() - addery);
+        loc.setY(loc.getY() + addery);
         loc.setZ(loc.getZ() + adderz);
 
         if (bd instanceof Directional) {
@@ -162,7 +162,7 @@ public class Events implements Listener {
     @EventHandler
     public void onDismount(EntityDismountEvent e) {
         if (e.getDismounted().hasMetadata("stair")) {
-            Bukkit.getScheduler().runTaskLater(instance, () -> e.getDismounted().remove(), 1L);
+            Bukkit.getScheduler().runTaskLater(Sit.getInstance(), () -> e.getDismounted().remove(), 1L);
         }
     }
 }
