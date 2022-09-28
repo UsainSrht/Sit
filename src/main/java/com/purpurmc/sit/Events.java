@@ -28,7 +28,7 @@ import java.util.Set;
 
 public class Events implements Listener {
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onSit(PlayerInteractEvent e) {
         if (!e.getHand().equals(EquipmentSlot.HAND)) return;
 
