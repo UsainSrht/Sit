@@ -1,5 +1,6 @@
-package com.purpurmc.sit;
+package com.purpurmc.sit.events;
 
+import com.purpurmc.sit.Sit;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -10,11 +11,10 @@ import org.bukkit.block.data.Bisected;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.type.Slab;
+import org.bukkit.block.data.type.Stairs;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.*;
-import org.bukkit.block.data.type.Stairs;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -22,13 +22,12 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.spigotmc.event.entity.EntityDismountEvent;
 
 import java.util.Set;
 
-public class Events implements Listener {
+public class onSit implements Listener {
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler
     public void onSit(PlayerInteractEvent e) {
         if (e.getHand() == null || !e.getHand().equals(EquipmentSlot.HAND)) return;
 
@@ -43,10 +42,22 @@ public class Events implements Listener {
 
         Player p = e.getPlayer();
 
+        if (p.isSneaking()) return;
+
+        if (!p.getInventory().getItemInMainHand().getType().equals(Material.AIR)) return;
+
+        if (p.isInsideVehicle()) return;
+
         Set<String> nodes = config.getConfigurationSection("sitables").getKeys(false);
         for (String node : nodes) {
 
-            if (!p.hasPermission("sit." + node)) break;
+            if (config.getBoolean("sitables." + node + ".permission.require")) {
+                String permission = config.getString("sitables." + node + ".permission.name");
+                if (permission != null && !permission.equals("")) {
+                    permission = String.format(permission, node);
+                    if (!p.hasPermission(permission)) break;
+                }
+            }
 
             String mode = config.getString("sitables." + node + ".check");
             switch (mode) {
@@ -85,12 +96,6 @@ public class Events implements Listener {
         else if (bd instanceof Slab) {
             if (!((Slab) bd).getType().equals(Slab.Type.BOTTOM)) return;
         }
-
-        if (p.isSneaking()) return;
-
-        if (!p.getInventory().getItemInMainHand().getType().equals(Material.AIR)) return;
-
-        if (p.isInsideVehicle()) return;
 
         e.setCancelled(true);
 
@@ -131,8 +136,8 @@ public class Events implements Listener {
             }
         }
 
-        String entitytype = config.getString("sitables." + offsetmode + ".entity.type");
-        Entity stair = p.getWorld().spawnEntity(loc, EntityType.valueOf(entitytype));
+        String entityType = config.getString("sitables." + offsetmode + ".entity.type");
+        Entity stair = p.getWorld().spawnEntity(loc, EntityType.valueOf(entityType));
 
         if (stair instanceof Steerable) {
             Steerable steerable = (Steerable) stair;
@@ -156,13 +161,6 @@ public class Events implements Listener {
         }
         else if (stair instanceof LivingEntity){
             ((LivingEntity)stair).setAI(false);
-        }
-    }
-
-    @EventHandler
-    public void onDismount(EntityDismountEvent e) {
-        if (e.getDismounted().hasMetadata("stair")) {
-            Bukkit.getScheduler().runTaskLater(Sit.getInstance(), () -> e.getDismounted().remove(), 1L);
         }
     }
 }

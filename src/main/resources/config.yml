@@ -1,9 +1,12 @@
 event:
+  # WIP
   onsit:
-    #https://purpurmc.org/javadoc/org/bukkit/event/EventPriority.html
-    priority: HIGH
+    # https://purpurmc.org/javadoc/org/bukkit/event/EventPriority.html
+    priority: HIGHEST
+    ignore_cancelled: true
   onstandup:
     priority: NORMAL
+    ignore_cancelled: false
 
 sitables:
   stairs:
@@ -30,6 +33,12 @@ sitables:
     list:
       - org.bukkit.block.data.type.Slab
   fun:
+    # if require is set to true
+    # player must have "sit.fun" permission to sit on the block's this layout has
+    permission:
+      require: true
+      # %s is the layout name
+      name: "sit.%s"
     entity:
       type: ARMOR_STAND
       saddle: false

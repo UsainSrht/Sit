@@ -6,7 +6,7 @@
 
     <groupId>com.purpurmc</groupId>
     <artifactId>sit</artifactId>
-    <version>1.2.1</version>
+    <version>1.3</version>
     <packaging>jar</packaging>
 
     <name>Sit</name>
