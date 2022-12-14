@@ -15,7 +15,7 @@ sitables:
       saddle: true
     offsets:
       x: 0.5
-      y: 0.4
+      y: -0.4
       z: 0.5
     #BLOCKDATA, BLOCKS
     check: BLOCKDATA
@@ -27,7 +27,7 @@ sitables:
       saddle: true
     offsets:
       x: 0.5
-      y: 0.4
+      y: -0.4
       z: 0.5
     check: BLOCKDATA
     list:
@@ -44,7 +44,7 @@ sitables:
       saddle: false
     offsets:
       x: 0.5
-      y: 0.9
+      y: -1.1
       z: 0.5
     check: BLOCKS
     list:
