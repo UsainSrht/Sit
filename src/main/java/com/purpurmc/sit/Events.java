@@ -30,7 +30,7 @@ public class Events implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onSit(PlayerInteractEvent e) {
-        if (!e.getHand().equals(EquipmentSlot.HAND)) return;
+        if (e.getHand() == null || !e.getHand().equals(EquipmentSlot.HAND)) return;
 
         if (!e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return;
 
