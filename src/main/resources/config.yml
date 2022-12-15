@@ -49,3 +49,6 @@ sitables:
     check: BLOCKS
     list:
       - END_ROD
+  # Number of ticks before mounting the entity
+  # 1 tick = instant but may see the player glitching in the air for 0.25 seconds
+  ticks_before_mount: 5
