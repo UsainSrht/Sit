@@ -157,7 +157,8 @@ public class onSit implements Listener {
         stair.setMetadata("stair", new FixedMetadataValue(instance, true));
         stair.teleport(loc);
 
-        Bukkit.getScheduler().runTaskLater(Sit.getInstance(), () -> stair.addPassenger(p), config.getLong("sitables.ticks_before_mount"));
+        Long ticksBeforeMount = (Long) config.getLong("sitables." + offsetmode + ".ticks_before_mount");
+        Bukkit.getScheduler().runTaskLater(Sit.getInstance(), () -> stair.addPassenger(p), ticksBeforeMount);
         
         if (stair instanceof ArmorStand) {
             ((ArmorStand) stair).setVisible(false);
