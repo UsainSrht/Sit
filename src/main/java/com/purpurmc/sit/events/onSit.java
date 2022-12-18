@@ -101,7 +101,7 @@ public class onSit implements Listener {
 
         Location loc = block.getLocation();
 
-        double adderX= config.getDouble("sitables." + selectedLayout + ".offsets.x");
+        double adderX = config.getDouble("sitables." + selectedLayout + ".offsets.x");
         double adderY = config.getDouble("sitables." + selectedLayout + ".offsets.y");
         double adderZ = config.getDouble("sitables." + selectedLayout + ".offsets.z");
 

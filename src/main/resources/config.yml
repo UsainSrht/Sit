@@ -42,7 +42,6 @@ sitables:
       name: "sit.%s"
     entity:
       type: ARMOR_STAND
-      saddle: false
     offsets:
       x: 0.5
       y: -1.1
