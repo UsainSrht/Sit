@@ -136,8 +136,10 @@ public class onSit implements Listener {
             }
         }
 
+        Location spawnLoc = loc.clone();
+        spawnLoc.setY(255);
         String entityType = config.getString("sitables." + offsetmode + ".entity.type");
-        Entity stair = p.getWorld().spawnEntity(loc, EntityType.valueOf(entityType));
+        Entity stair = p.getWorld().spawnEntity(spawnLoc, EntityType.valueOf(entityType));
 
         if (stair instanceof Steerable) {
             Steerable steerable = (Steerable) stair;
@@ -153,9 +155,11 @@ public class onSit implements Listener {
         stair.setInvulnerable(true);
         stair.setSilent(true);
         stair.setMetadata("stair", new FixedMetadataValue(instance, true));
+        stair.teleport(loc);
 
-        stair.addPassenger(p);
-
+        Long ticksBeforeMount = (Long) config.getLong("sitables." + offsetmode + ".ticks_before_mount");
+        Bukkit.getScheduler().runTaskLater(Sit.getInstance(), () -> stair.addPassenger(p), ticksBeforeMount);
+        
         if (stair instanceof ArmorStand) {
             ((ArmorStand) stair).setVisible(false);
         }
@@ -163,4 +167,4 @@ public class onSit implements Listener {
             ((LivingEntity)stair).setAI(false);
         }
     }
-}
+ }
