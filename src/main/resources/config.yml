@@ -21,8 +21,7 @@ sitables:
     check: BLOCKDATA
     list:
       - org.bukkit.block.data.type.Stairs
-    # Number of ticks before mounting the entity, increase if players see glitching in the air
-    ticks_before_mount: 5
+
   slabs:
     entity:
       type: PIG
@@ -34,7 +33,6 @@ sitables:
     check: BLOCKDATA
     list:
       - org.bukkit.block.data.type.Slab
-    ticks_before_mount: 5
   fun:
     # if require is set to true
     # player must have "sit.fun" permission to sit on the block's this layout has
@@ -52,4 +50,3 @@ sitables:
     check: BLOCKS
     list:
       - END_ROD
-    ticks_before_mount: 5

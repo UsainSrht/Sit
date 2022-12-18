@@ -33,9 +33,9 @@ public class onSit implements Listener {
 
         if (!e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return;
 
-        Block b = e.getClickedBlock();
-        BlockData bd = b.getBlockData();
-        String offsetmode = "";
+        Block block = e.getClickedBlock();
+        BlockData blockData = block.getBlockData();
+        String selectedLayout = null;
 
         Sit instance = Sit.getInstance();
         FileConfiguration config = instance.getConfig();
@@ -70,47 +70,47 @@ public class onSit implements Listener {
                         catch (ClassNotFoundException ex) {
                             throw new RuntimeException("class " + clasz + " doesn't exists.");
                         }
-                        if (claz.isInstance(bd)) {
-                            offsetmode = node;
+                        if (claz.isInstance(blockData)) {
+                            selectedLayout = node;
                             break;
                         }
                     }
                     break;
                 case "BLOCKS":
                     for (String material : config.getStringList("sitables." + node + ".list")) {
-                        if (b.getType().toString().equalsIgnoreCase(material)) {
-                            offsetmode = node;
+                        if (block.getType().toString().equalsIgnoreCase(material)) {
+                            selectedLayout = node;
                             break;
                         }
                     }
                     break;
             }
-            if (offsetmode.length() > 0) break;
+            if (selectedLayout != null) break;
         }
-        if (!(offsetmode.length() > 0)) return;
+        if (selectedLayout == null) return;
 
-        if (bd instanceof Stairs) {
-            Bisected bisected = (Bisected) bd;
+        if (blockData instanceof Stairs) {
+            Bisected bisected = (Bisected) blockData;
             if (!bisected.getHalf().equals(Bisected.Half.BOTTOM)) return;
         }
-        else if (bd instanceof Slab) {
-            if (!((Slab) bd).getType().equals(Slab.Type.BOTTOM)) return;
+        else if (blockData instanceof Slab) {
+            if (!((Slab) blockData).getType().equals(Slab.Type.BOTTOM)) return;
         }
 
         e.setCancelled(true);
 
-        Location loc = b.getLocation();
+        Location loc = block.getLocation();
 
-        double adderx = config.getDouble("sitables." + offsetmode + ".offsets.x");
-        double addery = config.getDouble("sitables." + offsetmode + ".offsets.y");
-        double adderz = config.getDouble("sitables." + offsetmode + ".offsets.z");
+        double adderX= config.getDouble("sitables." + selectedLayout + ".offsets.x");
+        double adderY = config.getDouble("sitables." + selectedLayout + ".offsets.y");
+        double adderZ = config.getDouble("sitables." + selectedLayout + ".offsets.z");
 
-        loc.setX(loc.getX() + adderx);
-        loc.setY(loc.getY() + addery);
-        loc.setZ(loc.getZ() + adderz);
+        loc.setX(loc.getX() + adderX);
+        loc.setY(loc.getY() + adderY);
+        loc.setZ(loc.getZ() + adderZ);
 
-        if (bd instanceof Directional) {
-            BlockFace facing = ((Directional) bd).getFacing();
+        if (blockData instanceof Directional) {
+            BlockFace facing = ((Directional) blockData).getFacing();
             switch (facing) {
                 case SOUTH: loc.setYaw(180);
                     break;
@@ -126,8 +126,8 @@ public class onSit implements Listener {
             loc.setYaw(p.getLocation().getYaw());
         }
 
-        if (bd instanceof Stairs) {
-            Stairs.Shape shape = ((Stairs) bd).getShape();
+        if (blockData instanceof Stairs) {
+            Stairs.Shape shape = ((Stairs) blockData).getShape();
             if (shape == Stairs.Shape.INNER_RIGHT || shape == Stairs.Shape.OUTER_RIGHT) {
                 loc.setYaw(loc.getYaw()+45);
             }
@@ -136,35 +136,31 @@ public class onSit implements Listener {
             }
         }
 
-        Location spawnLoc = loc.clone();
-        spawnLoc.setY(255);
-        String entityType = config.getString("sitables." + offsetmode + ".entity.type");
-        Entity stair = p.getWorld().spawnEntity(spawnLoc, EntityType.valueOf(entityType));
+        String entityType = config.getString("sitables." + selectedLayout + ".entity.type");
+        // create final value to use in lambda
+        final String layout = selectedLayout;
+        Entity entity = p.getWorld().spawn(loc, EntityType.valueOf(entityType).getEntityClass(), (stair -> {
+            if (stair instanceof Steerable) {
+                Steerable steerable = (Steerable) stair;
+                // set movement speed to 0 to entity to not move when steering item(carrot on a stick) held
+                steerable.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0);
 
-        if (stair instanceof Steerable) {
-            Steerable steerable = (Steerable) stair;
-
-            steerable.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 100000, 1, false, false, false));
-            steerable.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0);
-
-            if (config.getBoolean("sitables." + offsetmode + ".entity.saddle")) {
-                steerable.setSaddle(true);
+                if (config.getBoolean("sitables." + layout + ".entity.saddle")) {
+                    steerable.setSaddle(true);
+                }
             }
-        }
 
-        stair.setInvulnerable(true);
-        stair.setSilent(true);
-        stair.setMetadata("stair", new FixedMetadataValue(instance, true));
-        stair.teleport(loc);
+            stair.setInvulnerable(true);
+            stair.setSilent(true);
+            stair.setMetadata("stair", new FixedMetadataValue(instance, true));
 
-        Long ticksBeforeMount = (Long) config.getLong("sitables." + offsetmode + ".ticks_before_mount");
-        Bukkit.getScheduler().runTaskLater(Sit.getInstance(), () -> stair.addPassenger(p), ticksBeforeMount);
-        
-        if (stair instanceof ArmorStand) {
-            ((ArmorStand) stair).setVisible(false);
-        }
-        else if (stair instanceof LivingEntity){
-            ((LivingEntity)stair).setAI(false);
-        }
+            if (stair instanceof LivingEntity) {
+                LivingEntity livingEntity = (LivingEntity) stair;
+                livingEntity.setInvisible(true);
+                livingEntity.setAI(false);
+            }
+        }));
+
+        entity.addPassenger(p);
     }
- }
+}
