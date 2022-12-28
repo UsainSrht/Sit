@@ -1,7 +1,6 @@
 package com.purpurmc.sit.events;
 
 import com.purpurmc.sit.Sit;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -15,19 +14,18 @@ import org.bukkit.block.data.type.Stairs;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.Set;
 
 public class onSit implements Listener {
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onSit(PlayerInteractEvent e) {
         if (e.getHand() == null || !e.getHand().equals(EquipmentSlot.HAND)) return;
 
