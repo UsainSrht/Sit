@@ -25,7 +25,7 @@ import java.util.Set;
 
 public class onSit implements Listener {
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onSit(PlayerInteractEvent e) {
         if (e.getHand() == null || !e.getHand().equals(EquipmentSlot.HAND)) return;
 
@@ -33,10 +33,14 @@ public class onSit implements Listener {
 
         Block block = e.getClickedBlock();
         BlockData blockData = block.getBlockData();
-        String selectedLayout = null;
 
-        Sit instance = Sit.getInstance();
-        FileConfiguration config = instance.getConfig();
+        if (blockData instanceof Stairs) {
+            Bisected bisected = (Bisected) blockData;
+            if (!bisected.getHalf().equals(Bisected.Half.BOTTOM)) return;
+        }
+        else if (blockData instanceof Slab) {
+            if (!((Slab) blockData).getType().equals(Slab.Type.BOTTOM)) return;
+        }
 
         Player p = e.getPlayer();
 
@@ -45,6 +49,10 @@ public class onSit implements Listener {
         if (!p.getInventory().getItemInMainHand().getType().equals(Material.AIR)) return;
 
         if (p.isInsideVehicle()) return;
+
+        Sit instance = Sit.getInstance();
+        FileConfiguration config = instance.getConfig();
+        String selectedLayout = null;
 
         Set<String> nodes = config.getConfigurationSection("sitables").getKeys(false);
         for (String node : nodes) {
@@ -86,14 +94,6 @@ public class onSit implements Listener {
             if (selectedLayout != null) break;
         }
         if (selectedLayout == null) return;
-
-        if (blockData instanceof Stairs) {
-            Bisected bisected = (Bisected) blockData;
-            if (!bisected.getHalf().equals(Bisected.Half.BOTTOM)) return;
-        }
-        else if (blockData instanceof Slab) {
-            if (!((Slab) blockData).getType().equals(Slab.Type.BOTTOM)) return;
-        }
 
         e.setCancelled(true);
 
