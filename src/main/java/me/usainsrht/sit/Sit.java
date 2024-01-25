@@ -1,33 +1,32 @@
-package com.purpurmc.sit;
+package me.usainsrht.sit;
 
-import com.purpurmc.sit.events.onDismount;
-import com.purpurmc.sit.events.onSit;
+import me.usainsrht.sit.command.CommandHandler;
+import me.usainsrht.sit.command.SitCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public final class Sit extends JavaPlugin {
 
-    public static Sit instance;
+    private static Sit instance;
 
     @Override
     public void onEnable() {
         instance = this;
 
-        getServer().getPluginManager().registerEvents(new onSit(), this);
-        getServer().getPluginManager().registerEvents(new onDismount(), this);
-
         saveDefaultConfig();
+
+        //todo choose either making the plugin based on 1.13(blockdatas) or add support for 1.8 too
 
         CommandHandler.register(new SitCommand("sit",
                 "command to reload plugin's config",
                 "/sit reload",
-                new ArrayList<>()));
+                Collections.emptyList()));
     }
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
     }
 
     public static Sit getInstance() {

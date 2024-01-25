@@ -1,8 +1,9 @@
-package com.purpurmc.sit.events;
+package me.usainsrht.sit.listeners;
 
-import com.purpurmc.sit.Sit;
+import me.usainsrht.sit.Sit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -23,7 +24,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.Set;
 
-public class onSit implements Listener {
+public class InteractListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onSit(PlayerInteractEvent e) {
@@ -138,10 +139,10 @@ public class onSit implements Listener {
         // create final value to use in lambda
         final String layout = selectedLayout;
         Entity entity = p.getWorld().spawn(loc, EntityType.valueOf(entityType).getEntityClass(), (stair -> {
-            if (stair instanceof Steerable) {
-                Steerable steerable = (Steerable) stair;
+            if (stair instanceof Attributable) {
+                Attributable attributable = (Attributable) stair;
                 // set movement speed to 0 to entity to not move when steering item(carrot on a stick) held
-                steerable.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0);
+                attributable.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0);
 
                 if (config.getBoolean("sitables." + layout + ".entity.saddle")) {
                     steerable.setSaddle(true);

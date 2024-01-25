@@ -1,8 +1,7 @@
 name: Sit
 version: '${project.version}'
-main: com.purpurmc.sit.Sit
-api-version: 1.19
-prefix: Sit
-authors: [ UsainSrht ]
+main: me.usainsrht.sit.Sit
+api-version: 1.13
+author: UsainSrht
 description: Simple stair sitting plugin.
-website: purpurmc.com
+website: "https://usainsrht.works"

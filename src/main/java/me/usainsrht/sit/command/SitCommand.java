@@ -1,5 +1,6 @@
-package com.purpurmc.sit;
+package me.usainsrht.sit.command;
 
+import me.usainsrht.sit.Sit;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
@@ -10,7 +11,7 @@ import java.util.List;
 
 public class SitCommand extends Command {
 
-    protected SitCommand(@NotNull String name, @NotNull String description, @NotNull String usageMessage, @NotNull List<String> aliases) {
+    public SitCommand(@NotNull String name, @NotNull String description, @NotNull String usageMessage, @NotNull List<String> aliases) {
         super(name, description, usageMessage, aliases);
     }
 

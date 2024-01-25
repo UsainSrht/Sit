@@ -1,13 +1,13 @@
-package com.purpurmc.sit.events;
+package me.usainsrht.sit.listeners;
 
-import com.purpurmc.sit.Sit;
+import me.usainsrht.sit.Sit;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.spigotmc.event.entity.EntityDismountEvent;
 
 
-public class onDismount implements Listener {
+public class DismountListener implements Listener {
 
     @EventHandler
     public void onDismount(EntityDismountEvent e) {
