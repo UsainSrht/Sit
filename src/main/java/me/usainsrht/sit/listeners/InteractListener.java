@@ -21,6 +21,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.Set;
 
@@ -122,7 +124,7 @@ public class InteractListener implements Listener {
             }
         }
         else {
-            loc.setYaw(p.getLocation().getYaw());
+            loc.setYaw(p.getLocation().getYaw()+180);
         }
 
         if (blockData instanceof Stairs) {
@@ -144,8 +146,8 @@ public class InteractListener implements Listener {
                 // set movement speed to 0 to entity to not move when steering item(carrot on a stick) held
                 attributable.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0);
 
-                if (config.getBoolean("sitables." + layout + ".entity.saddle")) {
-                    steerable.setSaddle(true);
+                if (stair instanceof Pig && config.getBoolean("sitables." + layout + ".entity.saddle")) {
+                    ((Pig)stair).setSaddle(true);
                 }
             }
 
@@ -155,7 +157,8 @@ public class InteractListener implements Listener {
 
             if (stair instanceof LivingEntity) {
                 LivingEntity livingEntity = (LivingEntity) stair;
-                livingEntity.setInvisible(true);
+                livingEntity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 99999, 1, false, false));
+                //livingEntity.setInvisible(true);
                 livingEntity.setAI(false);
             }
         }));

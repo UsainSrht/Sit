@@ -2,9 +2,11 @@ package me.usainsrht.sit;
 
 import me.usainsrht.sit.command.CommandHandler;
 import me.usainsrht.sit.command.SitCommand;
+import me.usainsrht.sit.listeners.DismountListener;
+import me.usainsrht.sit.listeners.InteractListener;
+import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
 import java.util.Collections;
 
 public final class Sit extends JavaPlugin {
@@ -17,7 +19,8 @@ public final class Sit extends JavaPlugin {
 
         saveDefaultConfig();
 
-        //todo choose either making the plugin based on 1.13(blockdatas) or add support for 1.8 too
+        getServer().getPluginManager().registerEvents(new InteractListener(), this);
+        getServer().getPluginManager().registerEvents(new DismountListener(), this);
 
         CommandHandler.register(new SitCommand("sit",
                 "command to reload plugin's config",
@@ -27,6 +30,7 @@ public final class Sit extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        HandlerList.unregisterAll(this);
     }
 
     public static Sit getInstance() {
