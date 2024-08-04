@@ -1,13 +1,3 @@
-event:
-  # WIP
-  onsit:
-    # https://purpurmc.org/javadoc/org/bukkit/event/EventPriority.html
-    priority: HIGHEST
-    ignore_cancelled: true
-  onstandup:
-    priority: NORMAL
-    ignore_cancelled: false
-
 sitables:
   stairs:
     entity:

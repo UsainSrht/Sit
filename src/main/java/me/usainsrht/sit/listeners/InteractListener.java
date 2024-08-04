@@ -1,8 +1,9 @@
-package com.purpurmc.sit.events;
+package me.usainsrht.sit.listeners;
 
-import com.purpurmc.sit.Sit;
+import me.usainsrht.sit.Sit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -20,10 +21,12 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.Set;
 
-public class onSit implements Listener {
+public class InteractListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onSit(PlayerInteractEvent e) {
@@ -121,7 +124,7 @@ public class onSit implements Listener {
             }
         }
         else {
-            loc.setYaw(p.getLocation().getYaw());
+            loc.setYaw(p.getLocation().getYaw()+180);
         }
 
         if (blockData instanceof Stairs) {
@@ -138,13 +141,13 @@ public class onSit implements Listener {
         // create final value to use in lambda
         final String layout = selectedLayout;
         Entity entity = p.getWorld().spawn(loc, EntityType.valueOf(entityType).getEntityClass(), (stair -> {
-            if (stair instanceof Steerable) {
-                Steerable steerable = (Steerable) stair;
+            if (stair instanceof Attributable) {
+                Attributable attributable = (Attributable) stair;
                 // set movement speed to 0 to entity to not move when steering item(carrot on a stick) held
-                steerable.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0);
+                attributable.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0);
 
-                if (config.getBoolean("sitables." + layout + ".entity.saddle")) {
-                    steerable.setSaddle(true);
+                if (stair instanceof Pig && config.getBoolean("sitables." + layout + ".entity.saddle")) {
+                    ((Pig)stair).setSaddle(true);
                 }
             }
 
@@ -154,7 +157,8 @@ public class onSit implements Listener {
 
             if (stair instanceof LivingEntity) {
                 LivingEntity livingEntity = (LivingEntity) stair;
-                livingEntity.setInvisible(true);
+                livingEntity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 99999, 1, false, false));
+                //livingEntity.setInvisible(true);
                 livingEntity.setAI(false);
             }
         }));
