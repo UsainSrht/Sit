@@ -141,6 +141,7 @@ public class InteractListener implements Listener {
         // create final value to use in lambda
         final String layout = selectedLayout;
         Entity entity = p.getWorld().spawn(loc, EntityType.valueOf(entityType).getEntityClass(), (stair -> {
+            stair.setPersistent(false);
             if (stair instanceof Attributable) {
                 Attributable attributable = (Attributable) stair;
                 // set movement speed to 0 to entity to not move when steering item(carrot on a stick) held
