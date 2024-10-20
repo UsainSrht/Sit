@@ -6,7 +6,7 @@
 
     <groupId>me.usainsrht</groupId>
     <artifactId>sit</artifactId>
-    <version>1.7</version>
+    <version>1.7.1</version>
     <packaging>jar</packaging>
 
     <name>Sit</name>
