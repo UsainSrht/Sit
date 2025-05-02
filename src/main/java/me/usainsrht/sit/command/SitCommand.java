@@ -28,6 +28,8 @@ public class SitCommand extends Command {
             else {
                 sender.sendMessage("/sit reload");
             }
+        } else {
+            sender.sendMessage("Unknown command");
         }
         return true;
     }
