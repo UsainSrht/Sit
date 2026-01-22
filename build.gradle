@@ -1,0 +1,36 @@
+plugins {
+    id 'java'
+}
+
+group = 'me.usainsrht'
+version = '1.7'
+description = 'Simple stair sitting plugin.'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+repositories {
+    maven { url = 'https://hub.spigotmc.org/nexus/content/groups/public/' }
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly 'org.spigotmc:spigot-api:1.13-R0.1-SNAPSHOT'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+processResources {
+    filteringCharset = 'UTF-8'
+    filesMatching('plugin.yml') {
+        expand(project: [version: project.version])
+    }
+}
+
+jar {
+    archiveBaseName = 'sit'
+}
