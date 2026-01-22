@@ -1,5 +1,8 @@
+import xyz.jpenilla.runpaper.task.RunServer
+
 plugins {
     id 'java'
+    id("xyz.jpenilla.run-paper") version "3.0.2"
 }
 
 group = 'me.usainsrht'
@@ -7,8 +10,8 @@ version = '1.7'
 description = 'Simple stair sitting plugin.'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
 repositories {
@@ -33,4 +36,32 @@ processResources {
 
 jar {
     archiveBaseName = 'sit'
+}
+
+// https://papermc.io/downloads/all
+def supportedVersions = ["1.21.11",
+                         "1.20.6",
+                         "1.19.4",
+                         "1.18.2",
+                         "1.17.1",
+                         "1.16.5",
+                         "1.15.2",
+                         "1.14.4",
+                         "1.13", "1.13.2",
+                         ]
+
+supportedVersions.forEach { version ->
+    tasks.register("runServer-$version", RunServer) {
+        dependsOn("build")
+        minecraftVersion(version)
+        if (version.startsWith("1.13") || version.startsWith("1.14")) {
+            javaLauncher.set(javaToolchains.launcherFor {
+                languageVersion.set(JavaLanguageVersion.of(11))
+            })
+        }
+        runDirectory.set(file("run/$version"))
+        jvmArgs("-DPaper.IgnoreJavaVersion=true", "-Dcom.mojang.eula.agree=true")
+        group = "run paper"
+        pluginJars = files("$rootDir/build/libs/sit-${project.version}.jar")
+    }
 }
