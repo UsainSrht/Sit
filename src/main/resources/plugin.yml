@@ -4,4 +4,5 @@ main: me.usainsrht.sit.Sit
 api-version: 1.13
 author: UsainSrht
 description: Simple stair sitting plugin.
-website: "https://usainsrht.works"
+website: "https://usainsrht.com"
+folia-supported: true

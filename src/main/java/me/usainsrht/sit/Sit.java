@@ -6,18 +6,22 @@ import me.usainsrht.sit.listeners.DismountListener;
 import me.usainsrht.sit.listeners.InteractListener;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
+import space.arim.morepaperlib.MorePaperLib;
 
 import java.util.Collections;
 
 public final class Sit extends JavaPlugin {
 
     private static Sit instance;
+    private MorePaperLib morePaperLib;
 
     @Override
     public void onEnable() {
         instance = this;
 
         saveDefaultConfig();
+
+        this.morePaperLib = new MorePaperLib(this);
 
         getServer().getPluginManager().registerEvents(new InteractListener(), this);
         getServer().getPluginManager().registerEvents(new DismountListener(), this);
@@ -35,6 +39,10 @@ public final class Sit extends JavaPlugin {
 
     public static Sit getInstance() {
         return instance;
+    }
+
+    public MorePaperLib getMorePaperLib() {
+        return morePaperLib;
     }
 
 }

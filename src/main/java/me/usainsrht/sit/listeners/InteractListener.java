@@ -140,30 +140,36 @@ public class InteractListener implements Listener {
         String entityType = config.getString("sitables." + selectedLayout + ".entity.type");
         // create final value to use in lambda
         final String layout = selectedLayout;
-        Entity entity = p.getWorld().spawn(loc, EntityType.valueOf(entityType).getEntityClass(), (stair -> {
-            stair.setPersistent(false);
-            if (stair instanceof Attributable) {
-                Attributable attributable = (Attributable) stair;
-                // set movement speed to 0 to entity to not move when steering item(carrot on a stick) held
-                attributable.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0);
 
-                if (stair instanceof Pig && config.getBoolean("sitables." + layout + ".entity.saddle")) {
-                    ((Pig)stair).setSaddle(true);
+        // Use MorePaperLib's regionSpecificScheduler for Folia compatibility
+        // This ensures entity spawning and passenger mounting happen on the correct region thread
+        instance.getMorePaperLib().scheduling().regionSpecificScheduler(loc).run(() -> {
+            Entity entity = p.getWorld().spawn(loc, EntityType.valueOf(entityType).getEntityClass(), (stair -> {
+                stair.setPersistent(false);
+                if (stair instanceof Attributable) {
+                    Attributable attributable = (Attributable) stair;
+                    // set movement speed to 0 to entity to not move when steering item(carrot on a stick) held
+                    attributable.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0);
+
+                    if (stair instanceof Pig && config.getBoolean("sitables." + layout + ".entity.saddle")) {
+                        ((Pig)stair).setSaddle(true);
+                    }
                 }
-            }
 
-            stair.setInvulnerable(true);
-            stair.setSilent(true);
-            stair.setMetadata("stair", new FixedMetadataValue(instance, true));
+                stair.setInvulnerable(true);
+                stair.setSilent(true);
+                stair.setMetadata("stair", new FixedMetadataValue(instance, true));
 
-            if (stair instanceof LivingEntity) {
-                LivingEntity livingEntity = (LivingEntity) stair;
-                livingEntity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 99999, 1, false, false));
-                //livingEntity.setInvisible(true);
-                livingEntity.setAI(false);
-            }
-        }));
+                if (stair instanceof LivingEntity) {
+                    LivingEntity livingEntity = (LivingEntity) stair;
+                    livingEntity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 99999, 1, false, false));
+                    //livingEntity.setInvisible(true);
+                    livingEntity.setAI(false);
+                }
+            }));
 
-        entity.addPassenger(p);
+            // addPassenger must be called on the region thread owning the entity
+            entity.addPassenger(p);
+        });
     }
 }
