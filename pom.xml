@@ -6,7 +6,7 @@
 
     <groupId>me.usainsrht</groupId>
     <artifactId>sit</artifactId>
-    <version>1.7.2</version>
+    <version>1.7.3</version>
     <packaging>jar</packaging>
 
     <name>Sit</name>
@@ -41,6 +41,10 @@
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <relocations>
+                                <relocation>
+                                    <pattern>org.bstats</pattern>
+                                    <shadedPattern>me.usainsrht.sit.libs.bstats</shadedPattern>
+                                </relocation>
                                 <relocation>
                                     <pattern>space.arim.morepaperlib</pattern>
                                     <shadedPattern>me.usainsrht.sit.libs.morepaperlib</shadedPattern>
@@ -80,6 +84,12 @@
             <artifactId>spigot-api</artifactId>
             <version>1.13-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bstats</groupId>
+            <artifactId>bstats-bukkit</artifactId>
+            <version>3.2.1</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>space.arim.morepaperlib</groupId>

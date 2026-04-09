@@ -156,6 +156,7 @@ public class InteractListener implements Listener {
                     }
                 }
 
+                stair.setGravity(false);
                 stair.setInvulnerable(true);
                 stair.setSilent(true);
                 stair.setMetadata("stair", new FixedMetadataValue(instance, true));
@@ -165,6 +166,11 @@ public class InteractListener implements Listener {
                     livingEntity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 99999, 1, false, false));
                     //livingEntity.setInvisible(true);
                     livingEntity.setAI(false);
+
+                    if (stair instanceof ArmorStand) {
+                        ArmorStand armorStand = (ArmorStand) stair;
+                        armorStand.setVisible(false);
+                    }
                 }
             }));
 
