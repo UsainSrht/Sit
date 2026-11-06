@@ -55,13 +55,16 @@ public final class SitConfig {
         return layouts;
     }
 
+    /** Bundled default config, at a path unique to this mod (a bare /config.yml could resolve to another mod's file). */
+    private static final String DEFAULT_RESOURCE = "/sit/config.yml";
+
     /** Loads {@code <dir>/config.yml}, writing the bundled default first when the file does not exist. */
     public static SitConfig load(File dir) {
         File file = new File(dir, "config.yml");
         try {
             if (!file.exists()) {
                 Files.createDirectories(dir.toPath());
-                try (InputStream in = SitConfig.class.getResourceAsStream("/config.yml")) {
+                try (InputStream in = SitConfig.class.getResourceAsStream(DEFAULT_RESOURCE)) {
                     if (in != null) Files.copy(in, file.toPath());
                 }
             }
@@ -70,7 +73,7 @@ public final class SitConfig {
             }
         } catch (IOException | RuntimeException e) {
             SitMod.LOG.warning("Could not read " + file + ": " + e);
-            try (InputStream in = SitConfig.class.getResourceAsStream("/config.yml")) {
+            try (InputStream in = SitConfig.class.getResourceAsStream(DEFAULT_RESOURCE)) {
                 if (in != null) return parse(MiniYaml.parse(readAll(new java.io.InputStreamReader(in, StandardCharsets.UTF_8))));
             } catch (IOException | RuntimeException ignored) {
             }

@@ -69,6 +69,15 @@
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
             </resource>
+            <resource>
+                <!-- the mod reads its default config from this unique path, so it never picks up another mod's /config.yml -->
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>config.yml</include>
+                </includes>
+                <targetPath>sit</targetPath>
+                <filtering>true</filtering>
+            </resource>
         </resources>
     </build>
 
