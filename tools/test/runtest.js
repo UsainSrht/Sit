@@ -63,6 +63,11 @@ const slice = async (c, ms = 2500) => { const from = log.length; cmd(c); await s
   const seated = /Test passed/.test(out);
   step('bottom stair creates seat', seated, out.trim().split('\n').pop());
   if (SEAT.includes('tag=sit_seat')) {
+    // the seat must look like the plugin's: invisible (potion effect keeps the flag), saddled, facing the stair
+    out = await slice('data get entity @e[tag=sit_seat,limit=1]');
+    step('seat is invisible (effect)', /invisibility|Id: 14b/.test(out), '');
+    step('seat has a saddle', /Saddle: 1b|saddle: \{/.test(out), '');
+    step('seat faces the stair direction (east = yaw 90)', /Rotation: \[90\.0f/.test(out), (out.match(/Rotation: \[[^\]]*\]/) || [''])[0]);
     out = await slice('data get entity Bot RootVehicle.Entity.id');
     step('player rides the seat', /minecraft:pig/.test(out), out.trim().split('\n').pop());
   } else {

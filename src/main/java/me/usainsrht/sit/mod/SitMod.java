@@ -175,7 +175,7 @@ public final class SitMod {
             else if ("inner_left".equals(shape) || "outer_left".equals(shape)) yaw -= 45;
         }
 
-        Object seat = mc.spawnSeat(level, p, selected.entityType, x, y, z, yaw, SEAT_TAG);
+        Object seat = mc.spawnSeat(level, p, selected.entityType, x, y, z, yaw, SEAT_TAG, selected.saddle);
         if (seat == null) { debug("seat spawn failed"); return false; }
         debug("seated on " + selected.name);
         Seats.track(seat, 0);

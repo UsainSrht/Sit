@@ -46,6 +46,9 @@ public final class Mc {
     private Method vec3iX, vec3iY, vec3iZ, entityByString, createSeat1, createSeat2;
     private Method createSourceStack, hasPermissionInt, permissionsM, permSetHas;
     private Field isClientSideF, yRotF, removedF, spawnReason, gamemasterPerm;
+    private Class<?> pigC, effectInstanceC, itemStackC;
+    private Method setYBodyRot, setYHeadRot, addEffect, setItemSlot, equipSaddle1, equipSaddle2;
+    private Field invisibilityEffect, saddleSlot, saddleItem;
     private Object entityTypeRegistryObj;
     private final Map<String, Object> entityTypes = new HashMap<>();
     private final List<String> problems = new ArrayList<>();
@@ -74,7 +77,7 @@ public final class Mc {
         livingC = need(Names.cls("LivingEntity"), "class LivingEntity");
         mobC = Names.cls("Mob");
         Class<?> vec3i = Names.cls("Vec3i");
-        Class<?> itemStackC = Names.cls("ItemStack");
+        itemStackC = Names.cls("ItemStack");
         Class<?> blockStateC = Names.cls("BlockState");
 
         moveTo = need(Names.method("Entity.moveTo", entityC, 5), "Entity.moveTo");
@@ -85,6 +88,17 @@ public final class Mc {
         addTag = Names.method("Entity.addTag", entityC, 1);
         getTags = Names.method("Entity.getTags", entityC, 0);
         setNoAi = Names.method("Mob.setNoAi", mobC, 1);
+        pigC = Names.cls("Pig");
+        effectInstanceC = Names.cls("MobEffectInstance");
+        setYBodyRot = Names.method("LivingEntity.setYBodyRot", livingC, 1);
+        setYHeadRot = Names.method("LivingEntity.setYHeadRot", livingC, 1);
+        addEffect = Names.method("LivingEntity.addEffect", livingC, 1);
+        setItemSlot = Names.method("LivingEntity.setItemSlot", livingC, 2);
+        invisibilityEffect = Names.field("MobEffects.INVISIBILITY", Names.cls("MobEffects"));
+        saddleSlot = Names.field("EquipmentSlot.SADDLE", Names.cls("EquipmentSlot"));
+        saddleItem = Names.field("Items.SADDLE", Names.cls("Items"));
+        equipSaddle1 = pigC == null ? null : Names.method("Pig.equipSaddle", pigC, 1);
+        equipSaddle2 = pigC == null ? null : Names.method("Pig.equipSaddle2", pigC, 2);
         startRiding1 = Names.method("Entity.startRiding1", entityC, 1);
         startRiding2 = Names.method("Entity.startRiding2", entityC, 2);
         startRiding3 = Names.method("Entity.startRiding3", entityC, 3);
@@ -336,7 +350,7 @@ public final class Mc {
      *
      * @return the seat entity, or null when anything failed
      */
-    public Object spawnSeat(Object level, Object player, String typeName, double x, double y, double z, float yaw, String tag) {
+    public Object spawnSeat(Object level, Object player, String typeName, double x, double y, double z, float yaw, String tag, boolean saddle) {
         Object type = entityType(typeName.toLowerCase(java.util.Locale.ROOT));
         if (type == null) {
             SitMod.LOG.warning("Unknown entity type '" + typeName + "' in sitables config");
@@ -362,7 +376,15 @@ public final class Mc {
         if (mobC != null && mobC.isInstance(seat) && setNoAi != null) Names.invoke(setNoAi, seat, true);
         if (addTag != null) Names.invoke(addTag, seat, tag);
 
+        // Entity.moveTo only sets the entity's own yaw; a mob without AI never turns its body or head, so set both
+        if (livingC.isInstance(seat)) {
+            if (setYBodyRot != null) Names.invoke(setYBodyRot, seat, yaw);
+            if (setYHeadRot != null) Names.invoke(setYHeadRot, seat, yaw);
+        }
+        if (saddle) equipSaddle(seat);
+
         Names.invoke(addFreshEntity, level, seat);
+        applyInvisibilityEffect(seat);
         boolean mounted;
         if (startRiding2 != null) mounted = (Boolean) Names.invoke(startRiding2, player, seat, true);
         else if (startRiding3 != null) mounted = (Boolean) Names.invoke(startRiding3, player, seat, true, false);
@@ -373,6 +395,67 @@ public final class Mc {
             return null;
         }
         return seat;
+    }
+
+    /**
+     * Vanilla clears a mob's invisible flag on its first tick unless it has the invisibility effect, so the plugin's
+     * trick (flag plus a hidden, endless effect) is repeated here.
+     */
+    private void applyInvisibilityEffect(Object seat) {
+        if (addEffect == null || invisibilityEffect == null || effectInstanceC == null || !livingC.isInstance(seat)) return;
+        try {
+            Object effect = Names.get(invisibilityEffect, null);
+            for (Constructor<?> c : effectInstanceC.getConstructors()) {
+                Class<?>[] p = c.getParameterTypes();
+                if (p.length == 5 && p[0].isInstance(effect) && p[1] == int.class && p[2] == int.class
+                        && p[3] == boolean.class && p[4] == boolean.class) {
+                    Names.invoke(addEffect, seat, c.newInstance(effect, 99999, 1, false, false));
+                    return;
+                }
+            }
+            SitMod.debug("no MobEffectInstance constructor found");
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            SitMod.debug("could not apply invisibility effect: " + e);
+        }
+    }
+
+    /** Puts a saddle on a pig: equipment slot on 1.21.5+, Saddleable.equipSaddle before that. */
+    private void equipSaddle(Object seat) {
+        if (pigC == null || !pigC.isInstance(seat)) return;
+        try {
+            if (saddleSlot != null && setItemSlot != null && saddleItem != null) {
+                Object stack = newStack(Names.get(saddleItem, null));
+                if (stack != null) {
+                    Names.invoke(setItemSlot, seat, Names.get(saddleSlot, null), stack);
+                    return;
+                }
+            }
+            Method m = equipSaddle2 != null ? equipSaddle2 : equipSaddle1;
+            if (m == null) {
+                SitMod.debug("no way to saddle a pig on this version");
+                return;
+            }
+            Object[] args = new Object[m.getParameterTypes().length];
+            for (int i = 0; i < args.length; i++) {
+                if (m.getParameterTypes()[i] == itemStackC && saddleItem != null) args[i] = newStack(Names.get(saddleItem, null));
+            }
+            Names.invoke(m, seat, args);
+        } catch (RuntimeException e) {
+            SitMod.debug("could not saddle the pig: " + e);
+        }
+    }
+
+    private Object newStack(Object item) {
+        for (Constructor<?> c : itemStackC.getConstructors()) {
+            Class<?>[] p = c.getParameterTypes();
+            if (p.length == 1 && p[0].isInstance(item)) {
+                try {
+                    return c.newInstance(item);
+                } catch (ReflectiveOperationException | RuntimeException ignored) {
+                }
+            }
+        }
+        return null;
     }
 
     public boolean hasTag(Object entity, String tag) {

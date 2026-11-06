@@ -18,7 +18,7 @@
     "fabricloader": ">=0.11.0",
     "java": ">=8"
   },
-  "recommends": {
+  "suggests": {
     "fabric-api": "*"
   }
 }

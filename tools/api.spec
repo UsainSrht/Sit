@@ -27,7 +27,7 @@ class CommandSourceStack net.minecraft.commands.CommandSourceStack
 class MinecraftServer net.minecraft.server.MinecraftServer
 class ServerLevel net.minecraft.server.level.ServerLevel
 class ServerPlayer net.minecraft.server.level.ServerPlayer
-class Pig net.minecraft.world.entity.animal.Pig
+class Pig net.minecraft.world.entity.animal.Pig|net.minecraft.world.entity.animal.pig.Pig
 class StairBlock net.minecraft.world.level.block.StairBlock
 class SlabBlock net.minecraft.world.level.block.SlabBlock
 class FenceBlock net.minecraft.world.level.block.FenceBlock
@@ -132,3 +132,17 @@ method MinecraftServer.getPlayerList 0 MinecraftServer getPlayerList
 
 # --- seat persistence ---
 method Entity.getTags 0 Entity getTags|entityTags
+
+# --- seat appearance (invisible, saddle, facing) ---
+class MobEffects net.minecraft.world.effect.MobEffects
+class MobEffectInstance net.minecraft.world.effect.MobEffectInstance
+class Items net.minecraft.world.item.Items
+class EquipmentSlot net.minecraft.world.entity.EquipmentSlot
+field MobEffects.INVISIBILITY MobEffects INVISIBILITY
+field Items.SADDLE Items SADDLE
+field EquipmentSlot.SADDLE EquipmentSlot SADDLE
+method LivingEntity.addEffect 1 LivingEntity addEffect
+method LivingEntity.setYBodyRot 1 Entity|LivingEntity setYBodyRot
+method LivingEntity.setYHeadRot 1 Entity|LivingEntity setYHeadRot
+method LivingEntity.setItemSlot 2 Entity|LivingEntity|Mob setItemSlot
+method Pig.equipSaddle2 2 Pig|Saddleable equipSaddle
