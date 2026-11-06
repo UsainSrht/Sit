@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "sit",
+  "version": "${project.version}",
+  "name": "Sit",
+  "description": "A simple, highly configurable sitting mod. Right-click a stair, slab, or any custom block to sit down. Uses the same config.yml as the Sit plugin.",
+  "authors": ["UsainSrht"],
+  "contact": {
+    "homepage": "https://modrinth.com/plugin/stairsit",
+    "sources": "https://github.com/UsainSrht/Sit"
+  },
+  "license": "See https://github.com/UsainSrht/Sit",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["me.usainsrht.sit.mod.entry.SitFabric"]
+  },
+  "depends": {
+    "fabricloader": ">=0.11.0",
+    "java": ">=8"
+  },
+  "recommends": {
+    "fabric-api": "*"
+  }
+}

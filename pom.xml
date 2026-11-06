@@ -6,12 +6,12 @@
 
     <groupId>me.usainsrht</groupId>
     <artifactId>sit</artifactId>
-    <version>1.7.3</version>
+    <version>2.0.0</version>
     <packaging>jar</packaging>
 
     <name>Sit</name>
 
-    <description>Simple stair sitting plugin.</description>
+    <description>Simple stair sitting plugin and mod for Spigot, Paper, Purpur, Folia, Fabric, Forge and NeoForge.</description>
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -24,8 +24,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <release>8</release>
                 </configuration>
             </plugin>
             <plugin>
@@ -40,6 +39,16 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <filters>
+                                <filter>
+                                    <artifact>me.usainsrht:sit</artifact>
+                                    <excludes>
+                                        <exclude>net/fabricmc/**</exclude>
+                                        <exclude>net/minecraftforge/**</exclude>
+                                        <exclude>net/neoforged/**</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                             <relocations>
                                 <relocation>
                                     <pattern>org.bstats</pattern>
@@ -73,6 +82,10 @@
             <url>https://oss.sonatype.org/content/groups/public/</url>
         </repository>
         <repository>
+            <id>minecraft-libraries</id>
+            <url>https://libraries.minecraft.net/</url>
+        </repository>
+        <repository>
             <id>arim-mvn-lgpl3</id>
             <url>https://mvn-repo.arim.space/lesser-gpl3/</url>
         </repository>
@@ -95,6 +108,13 @@
             <groupId>space.arim.morepaperlib</groupId>
             <artifactId>morepaperlib</artifactId>
             <version>0.4.3</version>
+        </dependency>
+        <!-- Brigadier ships with Minecraft on every loader, only needed to compile the mod's /sit command -->
+        <dependency>
+            <groupId>com.mojang</groupId>
+            <artifactId>brigadier</artifactId>
+            <version>1.0.18</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

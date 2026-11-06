@@ -1,0 +1,13 @@
+{
+ "hasConfig": false,
+ "protocol": 404,
+ "ids": {
+  "cb_keep_alive": 33,
+  "sb_keep_alive": 14,
+  "cb_disconnect": 27,
+  "cb_login": 37,
+  "cb_player_position": 50,
+  "sb_accept_teleportation": 0,
+  "sb_use_item_on": 43
+ }
+}

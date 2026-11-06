@@ -1,10 +1,9 @@
 package me.usainsrht.sit.listeners;
 
+import me.usainsrht.sit.Compat;
 import me.usainsrht.sit.Sit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.attribute.Attributable;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Bisected;
@@ -21,8 +20,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.Set;
 
@@ -144,35 +141,33 @@ public class InteractListener implements Listener {
         // Use MorePaperLib's regionSpecificScheduler for Folia compatibility
         // This ensures entity spawning and passenger mounting happen on the correct region thread
         instance.getMorePaperLib().scheduling().regionSpecificScheduler(loc).run(() -> {
-            Entity entity = p.getWorld().spawn(loc, EntityType.valueOf(entityType).getEntityClass(), (stair -> {
-                stair.setPersistent(false);
-                if (stair instanceof Attributable) {
-                    Attributable attributable = (Attributable) stair;
-                    // set movement speed to 0 to entity to not move when steering item(carrot on a stick) held
-                    attributable.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0);
+            // spawnEntity (no Consumer overload) links on every version; the Consumer type changed
+            // from org.bukkit.util.Consumer to java.util.function.Consumer across releases.
+            Entity stair = p.getWorld().spawnEntity(loc, EntityType.valueOf(entityType));
+            Entity entity = stair;
 
-                    if (stair instanceof Pig && config.getBoolean("sitables." + layout + ".entity.saddle")) {
-                        ((Pig)stair).setSaddle(true);
-                    }
+            stair.setPersistent(false);
+            // set movement speed to 0 to entity to not move when steering item(carrot on a stick) held
+            Compat.freezeMovement(stair);
+
+            if (stair instanceof Pig && config.getBoolean("sitables." + layout + ".entity.saddle")) {
+                Compat.saddle((Pig) stair);
+            }
+
+            stair.setGravity(false);
+            stair.setInvulnerable(true);
+            stair.setSilent(true);
+            stair.setMetadata("stair", new FixedMetadataValue(instance, true));
+
+            if (stair instanceof LivingEntity) {
+                LivingEntity livingEntity = (LivingEntity) stair;
+                Compat.makeInvisible(livingEntity);
+                livingEntity.setAI(false);
+
+                if (stair instanceof ArmorStand) {
+                    ((ArmorStand) stair).setVisible(false);
                 }
-
-                stair.setGravity(false);
-                stair.setInvulnerable(true);
-                stair.setSilent(true);
-                stair.setMetadata("stair", new FixedMetadataValue(instance, true));
-
-                if (stair instanceof LivingEntity) {
-                    LivingEntity livingEntity = (LivingEntity) stair;
-                    livingEntity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 99999, 1, false, false));
-                    //livingEntity.setInvisible(true);
-                    livingEntity.setAI(false);
-
-                    if (stair instanceof ArmorStand) {
-                        ArmorStand armorStand = (ArmorStand) stair;
-                        armorStand.setVisible(false);
-                    }
-                }
-            }));
+            }
 
             // addPassenger must be called on the region thread owning the entity
             entity.addPassenger(p);

@@ -1,0 +1,13 @@
+modLoader="javafml"
+loaderVersion="[1,)"
+license="See https://github.com/UsainSrht/Sit"
+issueTrackerURL="https://github.com/UsainSrht/Sit/issues"
+
+[[mods]]
+modId="sit"
+version="${project.version}"
+displayName="Sit"
+displayURL="https://modrinth.com/plugin/stairsit"
+authors="UsainSrht"
+description='''A simple, highly configurable sitting mod. Right-click a stair, slab, or any custom block to sit down. Uses the same config.yml as the Sit plugin.'''
+displayTest="IGNORE_ALL_VERSION"

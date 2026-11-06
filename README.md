@@ -23,7 +23,9 @@
 - **Sit on stairs and slabs** — right-click any stair or slab with an empty hand to sit
 - **Fully configurable** — define unlimited custom *sittable* layouts in `config.yml`
 - **Permission-based layouts** — optionally lock any layout behind a permission node
+- **One jar for everything** — the same file runs as a plugin (Spigot, Paper, Purpur, Folia) and as a mod (Fabric, Forge, NeoForge)
 - **Folia compatible** — uses schedulers for full Folia/Paper/Spigot support
+- **Same `config.yml` everywhere** — move between the plugin and the mod without touching your configuration
 - **Two check modes** — match blocks by `BLOCKDATA` class or explicit `BLOCKS` material list
 
 ---
@@ -38,7 +40,24 @@ https://modrinth.com/plugin/stairsit
 
 ---
 
+## Supported platforms
+
+One `sit-x.x.x.jar` works on every platform below, there is nothing to pick between.
+
+| Platform | Minecraft versions | Where it goes |
+|----------|--------------------|---------------|
+| Spigot · Paper · Purpur · Folia | 1.13 – 26.3 | `plugins/` |
+| Fabric (needs [Fabric API](https://modrinth.com/mod/fabric-api)) | 1.16.5 – 26.3 | `mods/` |
+| Forge | 1.16.5 – 26.3 | `mods/` |
+| NeoForge | 1.20.2 – 26.3 | `mods/` |
+
+Mods run on dedicated servers and in singleplayer / LAN worlds (the integrated server runs the same code). They
+are server side only: players do **not** need the mod to join a server that has it, and installing it on a client
+that joins a server without Sit simply does nothing.
+
 ## Installation
+
+### Plugin (Spigot, Paper, Purpur, Folia)
 
 1. Download the latest `sit-x.x.x.jar` from [Modrinth](https://modrinth.com/plugin/stairsit).
 2. Drop the `.jar` into your server's `plugins/` folder.
@@ -46,7 +65,29 @@ https://modrinth.com/plugin/stairsit
 4. Tweak `config.yml` to your needs (see [Configuration](#configuration) below).
 5. Run `/sit reload` to apply config changes without restarting.
 
-> **Requirements:** Spigot / Paper / Folia &nbsp;·&nbsp; Minecraft **1.13+** &nbsp;·&nbsp; Java **8+**
+### Mod (Fabric, Forge, NeoForge)
+
+1. Download the same `sit-x.x.x.jar` and drop it into `mods/` (on a dedicated server, or in your game folder for singleplayer).
+2. On Fabric also install [Fabric API](https://modrinth.com/mod/fabric-api).
+3. Start the game or server — a default `config.yml` will be created under `config/Sit/`.
+4. Run `/sit reload` to apply config changes without restarting.
+
+> **Requirements:** Java **8+** for old versions; use the Java version your Minecraft version asks for.
+
+#### Mod specifics
+
+- **Config:** `config/Sit/config.yml`, same keys and behaviour as the plugin's `plugins/Sit/config.yml`.
+- **Permissions:** the mod has no permission system of its own, so it follows the plugin's default (operators). Layouts with
+  `permission.require: true` are allowed for operators (permission level 2) and for players granted the node through the
+  [Fabric Permissions API](https://github.com/lucko/fabric-permissions-api) (LuckPerms). `/sit reload` needs an operator.
+  In singleplayer, turn on cheats (or `/op` yourself) to use permission-locked layouts.
+- **`check: BLOCKDATA`:** the common Bukkit classes are understood (`Stairs`, `Slab`, `Fence`, `Wall`, `Gate`, `Door`,
+  `TrapDoor`, `Bed`, `Chest`, `Ladder`, `BlockData`) as well as the property interfaces (`Directional`, `Bisected`,
+  `Rotatable`, `Waterlogged`, `Openable`, `Powerable`, `Lightable`, ...). `check: BLOCKS` accepts any block id's path (`END_ROD`, `oak_stairs`).
+- **`entity.saddle`:** accepted but not needed, the seat entity is invisible and cannot be steered.
+- **Debugging:** start with `-Dsit.debug=true` to log why an interaction was or was not turned into sitting.
+
+---
 
 ---
 
@@ -142,7 +183,7 @@ sitables:
 
 ## Building from Source
 
-**Prerequisites:** Java 8+, [Apache Maven](https://maven.apache.org/) 3.6+
+**Prerequisites:** Java 8+ (the build uses `--release 8`), [Apache Maven](https://maven.apache.org/) 3.6+
 
 ```bash
 # 1. Clone the repository
@@ -153,7 +194,9 @@ cd Sit
 mvn package
 ```
 
-The shaded jar will be output to `target/sit-<version>.jar`.
+The shaded jar will be output to `target/sit-<version>.jar`. It is the plugin and the Fabric / Forge / NeoForge mod at the same time.
+
+How the mod side supports every Minecraft version with one jar, and how it is tested, is described in [tools/README.md](tools/README.md).
 
 ---
 
@@ -176,9 +219,10 @@ Contributions are welcome! Please follow these steps:
 ### Guidelines
 
 - Keep code style consistent with the existing codebase.
-- Any scheduling or entity spawning **must** use `MorePaperLib` schedulers to preserve Folia compatibility.
+- Any scheduling or entity spawning in the plugin **must** use `MorePaperLib` schedulers to preserve Folia compatibility.
+- The mod code must not reference Minecraft classes directly: go through `Names` / `Mc` (see [tools/README.md](tools/README.md)), and add new Minecraft members to `tools/api.spec`.
 - If you add a new config option, update `config.yml` **and** this README.
-- Verify your changes work on both Paper and Folia before submitting.
+- Verify your changes work on both Paper and Folia before submitting, and run `tools/test` for anything that touches the mod.
 
 ---
 
